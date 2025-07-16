@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Flair",
-  "name": "homebridge-flair",
-  "version": "0.0.0-development",
+  "name": "@jarlbrak/homebridge-flair",
+  "version": "2.0.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -9,10 +9,10 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git://github.com/bassrock/homebridge-flair.git"
+    "url": "git://github.com/jarlbrak/homebridge-flair-v2.git"
   },
   "bugs": {
-    "url": "https://github.com/bassrock/homebridge-flair/issues"
+    "url": "https://github.com/jarlbrak/homebridge-flair-v2/issues"
   },
   "engines": {
     "node": "^18.17.0 || ^20.0.0 || ^22.0.0",
@@ -43,7 +43,7 @@
   "dependencies": {
     "axios": "^1.6.5",
     "class-transformer": "^0.5.1",
-    "flair-api-ts": "^1.0.28",
+    "@jarlbrak/flair-api-ts": "latest",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

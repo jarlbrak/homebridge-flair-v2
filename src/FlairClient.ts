@@ -7,7 +7,7 @@ import {
   Structure,
   StructureHeatCoolMode,
   Model,
-} from 'flair-api-ts';
+} from '@jarlbrak/flair-api-ts';
 import { plainToClass } from 'class-transformer';
 import { AuthStrategy } from './auth/AuthStrategy';
 import { Logger } from 'homebridge';

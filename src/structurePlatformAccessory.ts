@@ -1,7 +1,7 @@
 import type {PlatformAccessory, Service, CharacteristicValue} from 'homebridge';
 
 import {FlairPlatform} from './platform';
-import {Structure, StructureHeatCoolMode, Client} from 'flair-api-ts';
+import {Structure, StructureHeatCoolMode, Client} from '@jarlbrak/flair-api-ts';
 
 /**
  * Platform Accessory

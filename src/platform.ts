@@ -19,7 +19,7 @@ import {
   StructureHeatCoolMode,
   Client,
   Model,
-} from 'flair-api-ts';
+} from '@jarlbrak/flair-api-ts';
 import { plainToClass } from 'class-transformer';
 import { getRandomIntInclusive } from './utils';
 import {FlairStructurePlatformAccessory} from './structurePlatformAccessory';

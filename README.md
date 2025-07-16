@@ -1,14 +1,22 @@
-# homebridge-flair
-[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+# Homebridge Flair v2
 
 [Flair Smart Vent](https://flair.co/products/vent) plug-in for [Homebridge](https://github.com/nfarina/homebridge) using the Flair API.
 
+This is version 2.0.0 of the homebridge-flair plugin, updated with modern OAuth 2.0 authentication and compatibility with the latest Homebridge versions.
+
+## What's New in v2.0.0
+
+- ✅ Updated to work with Homebridge ^1.6.0 and ^2.0.0-beta
+- ✅ Full OAuth 2.0 authentication support
+- ✅ Compatible with Node.js 18, 20, and 22
+- ✅ Updated to use modern Homebridge promise-based API
+- ✅ Uses the new @jarlbrak/flair-api-ts package with OAuth 2.0 support
+- ✅ Improved error handling and stability
 
 # Installation
 
-<!-- 2. Clone (or pull) this repository from github into the same path Homebridge lives (usually `/usr/local/lib/node_modules`). Note: the code currently on GitHub is in beta, and is newer than the latest published version of this package on `npm` -->
 1. Install homebridge using: `npm install -g homebridge`
-2. Install this plug-in using: `npm install -g homebridge-flair`
+2. Install this plug-in using: `npm install -g @jarlbrak/homebridge-flair`
 3. Update your configuration file. See example `config.json` snippet below.
 
 # Configuration
