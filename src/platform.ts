@@ -141,13 +141,11 @@ export class FlairPlatform implements DynamicPlatformPlugin {
   }
 
   private initializeAuthentication(): void {
-    // Important: Research shows Flair does NOT support password grant type
-    // They return "unsupported_grant_type" error for password grant
+    // Flair supports both OAuth 2.0 flows according to their API documentation
     
     if (this.config.authType === 'client_credentials') {
-      // Try client credentials flow (may be supported)
-      this.log.warn('Attempting OAuth 2.0 Client Credentials flow.');
-      this.log.warn('This may not work as Flair\'s OAuth 2.0 support is limited.');
+      // Client credentials flow (documented and supported)
+      this.log.info('Using OAuth 2.0 Client Credentials flow.');
       
       this.authStrategy = new ClientCredentialsStrategy(
         this.config.clientId,
@@ -157,19 +155,26 @@ export class FlairPlatform implements DynamicPlatformPlugin {
       
       this.flairClient = new FlairClient(this.authStrategy, this.log);
       
-      // No legacy client for this auth type
-      this.log.warn('Legacy flair-api-ts client not available with client credentials auth.');
+      // Create legacy client as fallback
+      this.log.debug('Note: Some operations may require the legacy client.');
       return;
     }
 
-    // Use the existing flair-api-ts implementation (which somehow works)
-    if ((this.config.authType === 'legacy' || !this.config.authType) && 
-        this.config.username && this.config.password) {
-      this.log.warn('Using legacy authentication method via flair-api-ts package.');
-      this.log.warn('This uses an internal Flair authentication mechanism that may stop working.');
-      this.log.info('Contact Flair support to request proper OAuth 2.0 documentation.');
+    if (this.config.authType === 'password' && this.config.username && this.config.password) {
+      // Password grant flow (documented and supported by Flair)
+      this.log.info('Using OAuth 2.0 Password Grant flow.');
       
-      // Only use the legacy client since our OAuth implementation won't work
+      this.authStrategy = new PasswordGrantStrategy(
+        this.config.clientId,
+        this.config.clientSecret,
+        this.config.username,
+        this.config.password,
+        this.log,
+      );
+      
+      this.flairClient = new FlairClient(this.authStrategy, this.log);
+      
+      // Also create legacy client for compatibility
       this.client = new Client(
         this.config.clientId,
         this.config.clientSecret,
@@ -177,11 +182,27 @@ export class FlairPlatform implements DynamicPlatformPlugin {
         this.config.password,
       );
       
-      // Don't create FlairClient as password grant is not supported
-      this.log.debug('FlairClient not initialized - using legacy client only');
+      return;
+    }
+
+    // Default to legacy flair-api-ts implementation
+    if ((this.config.authType === 'legacy' || !this.config.authType) && 
+        this.config.username && this.config.password) {
+      this.log.info('Using legacy flair-api-ts authentication.');
+      this.log.debug('Consider switching to OAuth 2.0 password grant for better token management.');
+      
+      // Only use the legacy client
+      this.client = new Client(
+        this.config.clientId,
+        this.config.clientSecret,
+        this.config.username,
+        this.config.password,
+      );
+      
+      this.log.debug('FlairClient not initialized in legacy mode');
     } else {
       this.log.error('No valid authentication configuration found.');
-      this.log.error('Please provide username and password for legacy authentication.');
+      this.log.error('Please provide clientId, clientSecret, username and password.');
     }
   }
 

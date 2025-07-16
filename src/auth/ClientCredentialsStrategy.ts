@@ -77,7 +77,7 @@ export class ClientCredentialsStrategy implements AuthStrategy {
   private async obtainToken(): Promise<void> {
     try {
       const response = await axios.post<TokenResponse>(
-        `${this.baseURL}/oauth/token`,
+        `${this.baseURL}/oauth2/token`,
         {
           client_id: this.clientId,
           client_secret: this.clientSecret,

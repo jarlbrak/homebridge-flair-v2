@@ -2,23 +2,27 @@
   "pluginAlias": "Flair",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "⚠️ **Important**: Flair's OAuth 2.0 implementation is limited. The plugin uses a legacy authentication method. Contact Flair support to request proper OAuth 2.0 documentation and support for modern authentication flows.",
+  "headerDisplay": "ℹ️ **Authentication**: Flair supports OAuth 2.0 Client Credentials and Password Grant flows. Contact Flair support at partners@flair.co to obtain your Client ID and Client Secret for your registered email address.",
   "schema": {
     "type": "object",
     "properties": {
       "authType": {
         "title": "Authentication Type",
         "type": "string",
-        "description": "Choose the authentication method. Legacy is the only working method currently.",
+        "description": "Choose the authentication method. Password Grant is recommended for better token management.",
         "default": "legacy",
         "required": false,
         "oneOf": [
           {
-            "title": "Legacy (flair-api-ts) - Currently Working",
+            "title": "Legacy (flair-api-ts) - Default",
             "enum": ["legacy"]
           },
           {
-            "title": "Client Credentials (Experimental)",
+            "title": "OAuth 2.0 Password Grant (Recommended)",
+            "enum": ["password"]
+          },
+          {
+            "title": "OAuth 2.0 Client Credentials",
             "enum": ["client_credentials"]
           }
         ]
@@ -43,7 +47,7 @@
         "description": "Username for Flair account (required for legacy authentication)",
         "required": false,
         "condition": {
-          "functionBody": "return model.authType === 'legacy' || !model.authType;"
+          "functionBody": "return model.authType === 'legacy' || model.authType === 'password' || !model.authType;"
         },
         "default": ""
       },
@@ -53,7 +57,7 @@
         "description": "Password for Flair account (required for legacy authentication)",
         "required": false,
         "condition": {
-          "functionBody": "return model.authType === 'legacy' || !model.authType;"
+          "functionBody": "return model.authType === 'legacy' || model.authType === 'password' || !model.authType;"
         },
         "default": ""
       },
@@ -140,7 +144,7 @@
       "items": [
         {
           "type": "help",
-          "helpvalue": "<div class='alert alert-warning'><b>Authentication Notice:</b> Flair's OAuth 2.0 implementation appears to be incomplete. The legacy authentication method (using flair-api-ts) is currently the only working option. Contact Flair support for proper OAuth 2.0 documentation.</div>"
+          "helpvalue": "<div class='alert alert-info'><b>OAuth 2.0 Support:</b> Flair supports OAuth 2.0 Password Grant and Client Credentials flows. The Password Grant method is recommended as it provides better token management with refresh tokens. Contact partners@flair.co to obtain your Client ID and Secret.</div>"
         },
         "authType",
         "clientId",

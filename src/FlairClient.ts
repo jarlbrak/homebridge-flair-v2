@@ -159,13 +159,15 @@ export class FlairClient {
    */
   async getPrimaryStructure(): Promise<Structure> {
     const structures = await this.getStructures();
-    const primary = structures.find(s => s.primary);
     
-    if (!primary) {
-      throw new Error('No primary structure found');
+    // Flair API typically returns the first structure as primary
+    // The 'primary' field may not exist on the Structure type
+    if (structures.length === 0) {
+      throw new Error('No structures found');
     }
     
-    return primary;
+    // Return the first structure as primary
+    return structures[0];
   }
 
   /**

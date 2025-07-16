@@ -4,8 +4,9 @@ import { Logger } from 'homebridge';
 
 /**
  * OAuth 2.0 Resource Owner Password Credentials Grant
- * This is the current authentication method used by Flair
- * NOTE: This grant type is deprecated in OAuth 2.1
+ * This is a supported authentication method for Flair API
+ * NOTE: While this grant type is deprecated in OAuth 2.1, 
+ * Flair currently supports and documents this method
  */
 export class PasswordGrantStrategy implements AuthStrategy {
   private token?: StoredToken;
@@ -18,6 +19,12 @@ export class PasswordGrantStrategy implements AuthStrategy {
     'vents.view',
     'vents.edit',
     'users.view',
+    'rooms.view',
+    'rooms.edit',
+    'thermostats.view',
+    'thermostats.edit',
+    'hvac-units.view',
+    'hvac-units.edit',
   ].join(' ');
 
   constructor(
@@ -27,9 +34,8 @@ export class PasswordGrantStrategy implements AuthStrategy {
     private readonly password: string,
     private readonly log: Logger,
   ) {
-    this.log.warn('Using deprecated OAuth 2.0 Resource Owner Password Credentials flow.');
-    this.log.warn('This authentication method will be removed in future OAuth 2.1 implementations.');
-    this.log.warn('Please contact Flair support about modern authentication options.');
+    this.log.info('Using OAuth 2.0 Resource Owner Password Credentials flow.');
+    this.log.debug('This is a documented and supported Flair authentication method.');
   }
 
   async getAccessToken(): Promise<string> {
@@ -97,7 +103,7 @@ export class PasswordGrantStrategy implements AuthStrategy {
   private async obtainToken(): Promise<void> {
     try {
       const response = await axios.post<TokenResponse>(
-        `${this.baseURL}/oauth/token`,
+        `${this.baseURL}/oauth2/token`,
         {
           client_id: this.clientId,
           client_secret: this.clientSecret,
@@ -122,7 +128,7 @@ export class PasswordGrantStrategy implements AuthStrategy {
 
     try {
       const response = await axios.post<TokenResponse>(
-        `${this.baseURL}/oauth/token`,
+        `${this.baseURL}/oauth2/token`,
         {
           client_id: this.clientId,
           client_secret: this.clientSecret,
