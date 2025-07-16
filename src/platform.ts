@@ -30,8 +30,8 @@ import {FlairStructurePlatformAccessory} from './structurePlatformAccessory';
  * parse the user config and discover/register accessories with Homebridge.
  */
 export class FlairPlatform implements DynamicPlatformPlugin {
-  public readonly Service = this.api.hap.Service;
-  public readonly Characteristic = this.api.hap.Characteristic;
+  public readonly Service: typeof this.api.hap.Service;
+  public readonly Characteristic: typeof this.api.hap.Characteristic;
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -53,6 +53,9 @@ export class FlairPlatform implements DynamicPlatformPlugin {
     public readonly config: PlatformConfig,
     public readonly api: API,
   ) {
+    this.Service = this.api.hap.Service;
+    this.Characteristic = this.api.hap.Characteristic;
+    
     this.log.debug('Finished initializing platform:', this.config.name);
 
     if (!this.validConfig()) {
