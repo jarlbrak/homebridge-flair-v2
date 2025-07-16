@@ -13,12 +13,57 @@
 
 # Configuration
 
-Configuration sample (edit `~/.homebridge/config.json`):
+This plugin supports three authentication methods:
+
+## OAuth 2.0 Password Grant (Recommended)
+
+This is the recommended authentication method for personal use. Configuration sample (edit `~/.homebridge/config.json`):
 
 ```json
 {
     "platforms": [
         {
+            "authType": "password",
+            "clientId": "your_client_id",
+            "clientSecret": "your_client_secret",
+            "username": "your_email@example.com",
+            "password": "your_password",
+            "pollInterval": 60,
+            "platform": "Flair",
+            "ventAccessoryType": "windowCovering"
+        }
+    ]
+}
+```
+
+## OAuth 2.0 Client Credentials
+
+This method is suitable for applications that don't require user-specific access:
+
+```json
+{
+    "platforms": [
+        {
+            "authType": "client_credentials",
+            "clientId": "your_client_id",
+            "clientSecret": "your_client_secret",
+            "pollInterval": 60,
+            "platform": "Flair",
+            "ventAccessoryType": "windowCovering"
+        }
+    ]
+}
+```
+
+## Legacy Authentication (Deprecated)
+
+⚠️ This method is deprecated and may be removed in future versions. Please migrate to OAuth 2.0.
+
+```json
+{
+    "platforms": [
+        {
+            "authType": "legacy",
             "clientId": "client_id",
             "clientSecret": "client_secret",
             "username": "user",
@@ -33,9 +78,19 @@ Configuration sample (edit `~/.homebridge/config.json`):
 
 # Obtaining Credentials
 
-In order to use this plugin you will need to obtain a client id and client secret from Flair. 
+To use this plugin with OAuth 2.0, you'll need to obtain a client ID and client secret from Flair:
 
-Start by creating a Flair account at [my.flair.co](https://my.flair.co/) (if you haven't already), then use [this web form to request credentials](https://forms.gle/VohiQjWNv9CAP2ASA).
+1. Create a Flair account at [my.flair.co](https://my.flair.co/) if you haven't already
+2. Contact Flair support at [partners@flair.co](mailto:partners@flair.co) with:
+   - Your registered email address
+   - A request for OAuth 2.0 API credentials
+   - Mention you're using the homebridge-flair plugin
+
+Flair will provide you with:
+- A Client ID
+- A Client Secret
+
+These credentials are tied to your registered email address, so make sure to use the same email in your configuration.
 
 More [API docs and details](https://flair.co/api)
 
