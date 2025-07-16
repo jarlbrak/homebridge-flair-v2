@@ -23,18 +23,8 @@
     "lint": "eslint src/**.ts --max-warnings=0",
     "lint:fix": "eslint --fix src/**",
     "watch": "npm run build && npm link && nodemon",
-    "build": "rimraf ./dist && tsc"
-  },
-  "release": {
-    "branches": [
-      "main"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
     "homebridge-plugin",
@@ -47,12 +37,6 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "6.0.3",
-    "@semantic-release/commit-analyzer": "11.1.0",
-    "@semantic-release/git": "10.0.1",
-    "@semantic-release/github": "9.2.6",
-    "@semantic-release/npm": "11.0.2",
-    "@semantic-release/release-notes-generator": "12.1.0",
     "@types/node": "20.11.0",
     "@typescript-eslint/eslint-plugin": "6.19.0",
     "@typescript-eslint/parser": "6.19.0",

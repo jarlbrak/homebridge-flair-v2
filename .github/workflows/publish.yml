@@ -1,27 +1,65 @@
-name: Publish
+name: Publish to npm
 
 on:
   push:
     branches:
       - main
 
-
 jobs:
-  publish:
+  check-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@dc323e67f16fb5f7663d20ff7941f27f5809e9b6 # v2
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-          persist-credentials: false
+          fetch-depth: 2
+      
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
-      - run: npm install
-      - run: npm run build
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v2
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Check if version changed
+        id: version-check
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Check if this version is already published
+          if npm view @jarlbrak/homebridge-flair@$CURRENT_VERSION version 2>/dev/null; then
+            echo "Version $CURRENT_VERSION is already published"
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version $CURRENT_VERSION is not published yet"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Install dependencies
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm ci
+      
+      - name: Build
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm run build
+      
+      - name: Publish to npm
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm publish --access public
         env:
-          # secrets.GITHUB_TOKEN does not have necessary permissions
-          GH_TOKEN: ${{ secrets.SEMENTIC_AND_DEPBOT_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create GitHub Release
+        if: steps.version-check.outputs.should_publish == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version-check.outputs.version }}
+          release_name: Release v${{ steps.version-check.outputs.version }}
+          body: |
+            Published version ${{ steps.version-check.outputs.version }} to npm
+            
+            Install with: `npm install -g @jarlbrak/homebridge-flair`
+          draft: false
+          prerelease: false
