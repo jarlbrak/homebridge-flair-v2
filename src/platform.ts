@@ -23,6 +23,10 @@ import {
 import { plainToClass } from 'class-transformer';
 import { getRandomIntInclusive } from './utils';
 import {FlairStructurePlatformAccessory} from './structurePlatformAccessory';
+import { FlairClient } from './FlairClient';
+import { AuthStrategy } from './auth/AuthStrategy';
+import { PasswordGrantStrategy } from './auth/PasswordGrantStrategy';
+import { ClientCredentialsStrategy } from './auth/ClientCredentialsStrategy';
 
 /**
  * HomebridgePlatform
@@ -37,6 +41,8 @@ export class FlairPlatform implements DynamicPlatformPlugin {
   public readonly accessories: PlatformAccessory[] = [];
 
   private client?: Client;
+  private flairClient?: FlairClient;
+  private authStrategy?: AuthStrategy;
 
   public structure?: Structure;
 
@@ -62,12 +68,8 @@ export class FlairPlatform implements DynamicPlatformPlugin {
       return;
     }
 
-    this.client = new Client(
-      this.config.clientId,
-      this.config.clientSecret,
-      this.config.username,
-      this.config.password,
-    );
+    // Initialize authentication strategy
+    this.initializeAuthentication();
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -136,6 +138,51 @@ export class FlairPlatform implements DynamicPlatformPlugin {
       );
     }
     return this._hasValidCredentials;
+  }
+
+  private initializeAuthentication(): void {
+    // Important: Research shows Flair does NOT support password grant type
+    // They return "unsupported_grant_type" error for password grant
+    
+    if (this.config.authType === 'client_credentials') {
+      // Try client credentials flow (may be supported)
+      this.log.warn('Attempting OAuth 2.0 Client Credentials flow.');
+      this.log.warn('This may not work as Flair\'s OAuth 2.0 support is limited.');
+      
+      this.authStrategy = new ClientCredentialsStrategy(
+        this.config.clientId,
+        this.config.clientSecret,
+        this.log,
+      );
+      
+      this.flairClient = new FlairClient(this.authStrategy, this.log);
+      
+      // No legacy client for this auth type
+      this.log.warn('Legacy flair-api-ts client not available with client credentials auth.');
+      return;
+    }
+
+    // Use the existing flair-api-ts implementation (which somehow works)
+    if ((this.config.authType === 'legacy' || !this.config.authType) && 
+        this.config.username && this.config.password) {
+      this.log.warn('Using legacy authentication method via flair-api-ts package.');
+      this.log.warn('This uses an internal Flair authentication mechanism that may stop working.');
+      this.log.info('Contact Flair support to request proper OAuth 2.0 documentation.');
+      
+      // Only use the legacy client since our OAuth implementation won't work
+      this.client = new Client(
+        this.config.clientId,
+        this.config.clientSecret,
+        this.config.username,
+        this.config.password,
+      );
+      
+      // Don't create FlairClient as password grant is not supported
+      this.log.debug('FlairClient not initialized - using legacy client only');
+    } else {
+      this.log.error('No valid authentication configuration found.');
+      this.log.error('Please provide username and password for legacy authentication.');
+    }
   }
 
   private async getNewStructureReadings() {

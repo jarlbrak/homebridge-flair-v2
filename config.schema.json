@@ -2,43 +2,69 @@
   "pluginAlias": "Flair",
   "pluginType": "platform",
   "singular": true,
+  "headerDisplay": "⚠️ **Important**: Flair's OAuth 2.0 implementation is limited. The plugin uses a legacy authentication method. Contact Flair support to request proper OAuth 2.0 documentation and support for modern authentication flows.",
   "schema": {
     "type": "object",
     "properties": {
+      "authType": {
+        "title": "Authentication Type",
+        "type": "string",
+        "description": "Choose the authentication method. Legacy is the only working method currently.",
+        "default": "legacy",
+        "required": false,
+        "oneOf": [
+          {
+            "title": "Legacy (flair-api-ts) - Currently Working",
+            "enum": ["legacy"]
+          },
+          {
+            "title": "Client Credentials (Experimental)",
+            "enum": ["client_credentials"]
+          }
+        ]
+      },
       "clientId": {
         "title": "Client ID",
         "type": "string",
-        "description": "Client ID obtained from Flair Support",
+        "description": "Client ID obtained from Flair Support (required for all auth types)",
         "required": true,
         "default": ""
       },
       "clientSecret": {
         "title": "Client Secret",
         "type": "string",
-        "description": "Client Secret obtained from Flair Support",
+        "description": "Client Secret obtained from Flair Support (required for all auth types)",
         "required": true,
         "default": ""
       },
       "username": {
-        "title": "username",
+        "title": "Username",
         "type": "string",
-        "description": "Username used to access Flair",
-        "required": true,
+        "description": "Username for Flair account (required for legacy authentication)",
+        "required": false,
+        "condition": {
+          "functionBody": "return model.authType === 'legacy' || !model.authType;"
+        },
         "default": ""
       },
       "password": {
-        "title": "password",
+        "title": "Password",
         "type": "string",
-        "description": "Password used to access Flair",
-        "required": true,
+        "description": "Password for Flair account (required for legacy authentication)",
+        "required": false,
+        "condition": {
+          "functionBody": "return model.authType === 'legacy' || !model.authType;"
+        },
         "default": ""
       },
       "pollInterval": {
         "title": "Poll Interval",
         "type": "number",
-        "description": "How often the plugin should poll the Flair API for updates.",
+        "description": "How often the plugin should poll the Flair API for updates (in seconds).",
         "required": true,
-        "default": 60
+        "default": 60,
+        "minimum": 30,
+        "maximum": 600
       },
       "hidePuckSensors": {
         "title": "Hide puck sensors",
@@ -102,5 +128,48 @@
         ]
       }
     }
-  }
+  },
+  "form": null,
+  "display": null,
+  "layout": [
+    {
+      "type": "section",
+      "title": "Authentication",
+      "expandable": true,
+      "expanded": true,
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<div class='alert alert-warning'><b>Authentication Notice:</b> Flair's OAuth 2.0 implementation appears to be incomplete. The legacy authentication method (using flair-api-ts) is currently the only working option. Contact Flair support for proper OAuth 2.0 documentation.</div>"
+        },
+        "authType",
+        "clientId",
+        "clientSecret",
+        "username",
+        "password"
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Plugin Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "pollInterval",
+        "ventAccessoryType"
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Device Visibility",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "hidePuckSensors",
+        "hidePuckRooms",
+        "hidePrimaryStructure",
+        "hideVentTemperatureSensors"
+      ]
+    }
+  ]
 }
